@@ -37,6 +37,20 @@
                 </div>
             </section>
         </template>
+        <!-- Filter for posts -->
+        <template>
+            <section class="filter">
+                <div class="container">
+                    <div class="filter__wrap">
+                        <span class="filter__desc">Сортировать посты по</span>
+                        <ul class="filter__list">
+                            <li @click="sortOfDate" class="filter__item">[ дате ]</li>
+                            <li @click="sortOfRating" class="filter__item">[ рейтингу ]</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </template>
         <!-- Posts list -->
         <section class="posts">
             <div class="container">
@@ -71,16 +85,19 @@
                                 class="comments__wrap">
                                 <ul class="comments__list">
                                     <li v-for="comment in post.comments"
-                                        class="comments__item">{{ comment }}</li>
+                                        class="comments__item">
+                                        <span class="comments__item-name">Anonym</span>
+                                        <span class="comments__item-text">{{ comment }}</span>
+                                    </li>
                                 </ul>
                             </div>
                             <span v-else
                                 class="comments__empty">Комментариев пока нет</span>
                             <div class="comments__add-new">
-                                <form v-on:submit="addComment(index)">
+                                <form v-on:submit="addComment(index)"  class="comments-add-new__form">
                                     <input type="text" 
-                                        placeholder="Комментировать">
-                                    <button>Отправить</button>
+                                        placeholder="Комментировать"  class="comments-add-new__text">
+                                    <button class="comments-add-new__submit">Отправить</button>
                                 </form>
                             </div>
                         </div>
@@ -93,6 +110,8 @@
 
 <script>
 
+import Posts from "../api/posts.js";
+
 export default {
     data() {
         return {
@@ -104,7 +123,7 @@ export default {
                     "text": "Текст первого поста",
                     "date": "10.08.2019",
                     "author": "Andrey",
-                    "rating": 0,
+                    "rating": 4,
                     "comments": [
                         "Интересная история",
                         "Ну такое.."
@@ -115,7 +134,7 @@ export default {
                     "text": "Текст второго поста",
                     "date": "08.08.2019",
                     "author": "Sergey",
-                    "rating": 0,
+                    "rating": 3,
                     "comments": [
 
                     ]
@@ -125,7 +144,7 @@ export default {
                     "text": "Текст третьего поста",
                     "date": "09.08.2019",
                     "author": "Dmitriy",
-                    "rating": 0,
+                    "rating": 7,
                     "comments": [
 
                     ]
@@ -133,21 +152,27 @@ export default {
             ]
         };
     },
+    meteor: {
+        postList() {
+            return Posts.find({});
+        }
+    },
     methods: {
         showWritePost() {
             return this.showToggle = !this.showToggle;
         },
         ratingMinus(indx) {
-            return this.posts[indx].rating--;
+            return this.reversedItems[indx].rating--;
         },
         ratingPlus(indx) {
-            return this.posts[indx].rating++;
+            return this.reversedItems[indx].rating++;
         },
         addComment(indx) {
             event.preventDefault();
 
             let inputValue = event.target[0].value;
             this.reversedItems[indx].comments.push(inputValue);
+            
             event.target[0].value = '';
         },
         addNewPost() {
@@ -159,22 +184,54 @@ export default {
             today = dd + '.' + mm + '.' + yyyy;
 
             let postsLength = this.posts.length;
-
-            this.posts.push({
-                "_id": postsLength,
+            let newPost = {
                 "text": this.postTextValue,
                 "date": today,
                 "author": "2bash+anon"+ postsLength,
                 "rating": 0,
-                "comments": ""
-            });
+                "comments": []
+            };
+
+            Posts.insert(newPost);
+
+            // this.posts.push({
+            //     "_id": postsLength,
+            //     "text": this.postTextValue,
+            //     "date": today,
+            //     "author": "2bash+anon"+ postsLength,
+            //     "rating": 0,
+            //     "comments": []
+            // });
             this.showWritePost();
             this.postTextValue = '';            
+        },
+        sortOfRating() {
+            let sortArray = this.posts;
+
+            return sortArray.sort((a, b) => a.rating - b.rating);
+        },
+        sortOfDate() {
+            let sortArray = this.posts;
+
+            return sortArray.sort((a, b) => {
+                let aTempDate = a.date;
+                let bTempDate = b.date;
+
+                aTempDate = new Date(aTempDate.split('.').reverse().join('-'));
+                bTempDate = new Date(bTempDate.split('.').reverse().join('-'));
+
+                return aTempDate - bTempDate;
+            });
         }
     },
     computed: {
         reversedItems() {
-            return this.posts.slice().reverse();
+            // let sortArray = this.posts;
+            // sortArray.sort((a, b) => a.rating - b.rating);
+            // return sortArray.slice().reverse()
+            console.log(this.postList);
+            
+            return this.postList.slice().reverse();
         }
     }
 }
