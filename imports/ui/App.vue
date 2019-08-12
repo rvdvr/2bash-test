@@ -76,9 +76,9 @@
                     <!-- PostRatio -->
                     <template>
                         <div class="post__rating">
-                            <span class="rating__dislike" @click="ratingMinus(index)">[ - ]</span>
+                            <span class="rating__dislike" @click="ratingMinus(post._id, post.rating)">[ - ]</span>
                             <span class="rating__counter">{{ post.rating }}</span>
-                            <span class="rating__like" @click="ratingPlus(index)">[ + ]</span>
+                            <span class="rating__like" @click="ratingPlus(post._id, post.rating)">[ + ]</span>
                         </div>
                     </template>
                     <div class="comments">
@@ -169,7 +169,7 @@ export default {
 
             today = dd + '.' + mm + '.' + yyyy;
 
-            let postsLength = this.posts.length;
+            let postsLength = this.postList.length;
             let newPost = {
                 "text": this.postTextValue,
                 "date": today,
@@ -195,19 +195,19 @@ export default {
 
             event.target[0].value = '';
         },
-        ratingMinus(indx) {
-            return this.reversedItems[indx].rating--;
+        ratingMinus(postId, postRating) {
+            Posts.update(postId, { $set: { rating: postRating - 1 }});
         },
-        ratingPlus(indx) {
-            return this.reversedItems[indx].rating++;
+        ratingPlus(postId, postRating) {
+            Posts.update(postId, { $set: { rating: postRating + 1 }});
         },
         sortOfRating() {
-            let sortArray = this.posts;
+            let sortArray = this.postList;
 
             return sortArray.sort((a, b) => a.rating - b.rating);
         },
         sortOfDate() {
-            let sortArray = this.posts;
+            let sortArray = this.postList;
 
             return sortArray.sort((a, b) => {
                 let aTempDate = a.date;
