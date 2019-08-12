@@ -55,54 +55,54 @@
         <section class="posts">
             <div class="container">
                 <!-- Post -->
-                <template v-for="(post, index) in reversedItems">
-                    <article class="post">
-                        <!-- PostHead -->
-                        <template>
-                            <div class="post__top">
-                                <span class="post__author">{{ post.author }}</span>
-                                <span class="post__date">{{ post.date }}</span>
-                            </div>
-                        </template>
-                        <!-- PostText -->
-                        <template>
-                            <div class="post__text">
-                                <p style="white-space: pre-line;">
-                                    {{ post.text }}
-                                </p>
-                            </div>
-                        </template>
-                        <!-- PostRatio -->
-                        <template>
-                            <div class="post__rating">
-                                <span class="rating__dislike" @click="ratingMinus(index)">[ - ]</span>
-                                <span class="rating__counter">{{ post.rating }}</span>
-                                <span class="rating__like" @click="ratingPlus(index)">[ + ]</span>
-                            </div>
-                        </template>
-                        <div class="comments">
-                            <div v-if="post.comments.length > 0"
-                                class="comments__wrap">
-                                <ul class="comments__list">
-                                    <li v-for="comment in post.comments"
-                                        class="comments__item">
-                                        <span class="comments__item-name">Anonym</span>
-                                        <span class="comments__item-text">{{ comment }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <span v-else
-                                class="comments__empty">Комментариев пока нет</span>
-                            <div class="comments__add-new">
-                                <form v-on:submit="addComment(index)"  class="comments-add-new__form">
-                                    <input type="text" 
-                                        placeholder="Комментировать"  class="comments-add-new__text">
-                                    <button class="comments-add-new__submit">Отправить</button>
-                                </form>
-                            </div>
+                <article v-for="(post, index) in reversedItems" 
+                    v-bind:key="post._id" 
+                    class="post">
+                    <!-- PostHead -->
+                    <template>
+                        <div class="post__top">
+                            <span class="post__author">{{ post.author }}</span>
+                            <span class="post__date">{{ post.date }}</span>
                         </div>
-                    </article>
-                </template>
+                    </template>
+                    <!-- PostText -->
+                    <template>
+                        <div class="post__text">
+                            <p style="white-space: pre-line;">
+                                {{ post.text }}
+                            </p>
+                        </div>
+                    </template>
+                    <!-- PostRatio -->
+                    <template>
+                        <div class="post__rating">
+                            <span class="rating__dislike" @click="ratingMinus(index)">[ - ]</span>
+                            <span class="rating__counter">{{ post.rating }}</span>
+                            <span class="rating__like" @click="ratingPlus(index)">[ + ]</span>
+                        </div>
+                    </template>
+                    <div class="comments">
+                        <div v-if="post.comments.length > 0"
+                            class="comments__wrap">
+                            <ul class="comments__list">
+                                <li v-for="comment in post.comments"
+                                    class="comments__item">
+                                    <span class="comments__item-name">Anonym</span>
+                                    <span class="comments__item-text">{{ comment }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <span v-else
+                            class="comments__empty">Комментариев пока нет</span>
+                        <div class="comments__add-new">
+                            <form v-on:submit="addComment(post._id, post.comments)"  class="comments-add-new__form">
+                                <input type="text" 
+                                    placeholder="Комментировать"  class="comments-add-new__text">
+                                <button class="comments-add-new__submit">Отправить</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
             </div>
         </section>
     </main>
@@ -161,20 +161,6 @@ export default {
         showWritePost() {
             return this.showToggle = !this.showToggle;
         },
-        ratingMinus(indx) {
-            return this.reversedItems[indx].rating--;
-        },
-        ratingPlus(indx) {
-            return this.reversedItems[indx].rating++;
-        },
-        addComment(indx) {
-            event.preventDefault();
-
-            let inputValue = event.target[0].value;
-            this.reversedItems[indx].comments.push(inputValue);
-            
-            event.target[0].value = '';
-        },
         addNewPost() {
             let today = new Date();
             let dd = String(today.getDate()).padStart(2, '0');
@@ -194,16 +180,26 @@ export default {
 
             Posts.insert(newPost);
 
-            // this.posts.push({
-            //     "_id": postsLength,
-            //     "text": this.postTextValue,
-            //     "date": today,
-            //     "author": "2bash+anon"+ postsLength,
-            //     "rating": 0,
-            //     "comments": []
-            // });
             this.showWritePost();
             this.postTextValue = '';            
+        },
+        addComment(postId, postComments) {
+            event.preventDefault();
+
+            let inputValue = event.target[0].value;
+            let totalComments = postComments.map(elem => elem);
+
+            totalComments.push(inputValue);
+            
+            Posts.update(postId, { $set: { comments: totalComments }});
+
+            event.target[0].value = '';
+        },
+        ratingMinus(indx) {
+            return this.reversedItems[indx].rating--;
+        },
+        ratingPlus(indx) {
+            return this.reversedItems[indx].rating++;
         },
         sortOfRating() {
             let sortArray = this.posts;
