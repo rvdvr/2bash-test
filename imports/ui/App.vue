@@ -116,40 +116,7 @@ export default {
     data() {
         return {
             postTextValue: '',
-            showToggle: false,
-            posts: [
-                {
-                    "_id": "1",
-                    "text": "Текст первого поста",
-                    "date": "10.08.2019",
-                    "author": "Andrey",
-                    "rating": 4,
-                    "comments": [
-                        "Интересная история",
-                        "Ну такое.."
-                    ]
-                },
-                {
-                    "_id": "2",
-                    "text": "Текст второго поста",
-                    "date": "08.08.2019",
-                    "author": "Sergey",
-                    "rating": 3,
-                    "comments": [
-
-                    ]
-                },
-                {
-                    "_id": "3",
-                    "text": "Текст третьего поста",
-                    "date": "09.08.2019",
-                    "author": "Dmitriy",
-                    "rating": 7,
-                    "comments": [
-
-                    ]
-                }
-            ]
+            showToggle: false
         };
     },
     meteor: {
@@ -162,17 +129,19 @@ export default {
             return this.showToggle = !this.showToggle;
         },
         addNewPost() {
-            let today = new Date();
-            let dd = String(today.getDate()).padStart(2, '0');
-            let mm = String(today.getMonth() + 1).padStart(2, '0');
-            let yyyy = today.getFullYear();
+            let todayDate = () => {
+                let today = new Date();
+                let dd = String(today.getDate()).padStart(2, '0');
+                let mm = String(today.getMonth() + 1).padStart(2, '0');
+                let yyyy = today.getFullYear();
 
-            today = dd + '.' + mm + '.' + yyyy;
+                return dd + '.' + mm + '.' + yyyy;
+            }           
 
             let postsLength = this.postList.length;
             let newPost = {
                 "text": this.postTextValue,
-                "date": today,
+                "date": todayDate(),
                 "author": "2bash+anon"+ postsLength,
                 "rating": 0,
                 "comments": []
@@ -190,9 +159,7 @@ export default {
             let totalComments = postComments.map(elem => elem);
 
             totalComments.push(inputValue);
-            
             Posts.update(postId, { $set: { comments: totalComments }});
-
             event.target[0].value = '';
         },
         ratingMinus(postId, postRating) {
@@ -222,11 +189,6 @@ export default {
     },
     computed: {
         reversedItems() {
-            // let sortArray = this.posts;
-            // sortArray.sort((a, b) => a.rating - b.rating);
-            // return sortArray.slice().reverse()
-            console.log(this.postList);
-            
             return this.postList.slice().reverse();
         }
     }
