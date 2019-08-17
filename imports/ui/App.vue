@@ -1,56 +1,11 @@
 <template>
     <main>
         <!-- Component Header -->
-        <template>
-            <header class="header">
-                <div class="container">
-                    <div class="header__wrap">
-                        <span class="header__logo">2bash</span>
-                        <div class="header__btns">
-                            <v-btn 
-                                @click="showWritePost"
-                                class="header__new-post">Добавить историю</v-btn>
-                            <v-btn>Войти</v-btn>
-                        </div>
-                    </div>
-                </div>
-            </header>
-        </template>
+        <Header @toggleNewPost="showWritePost"/>
         <!-- Component Write post -->
-        <template v-if="showToggle">
-            <section class="write-post">
-                <div class="container">
-                    <div class="write-post__wrap">
-                        <h2 class="write-post__title">Вы можете написать здесь свой текст</h2>
-                        <form class="write-post__form">
-                            <textarea 
-                                v-model="postTextValue" 
-                                rows="7" 
-                                class="write-post-form__textarea" 
-                                placeholder="Введите текст"
-                                ></textarea>
-                            <v-btn 
-                                @click="addNewPost"
-                                class="write-post-form__btn-submit">Добавить</v-btn>
-                        </form>
-                    </div>
-                </div>
-            </section>
-        </template>
+        <newPostCard :showToggle="showToggle"/>
         <!-- Filter for posts -->
-        <template>
-            <section class="filter">
-                <div class="container">
-                    <div class="filter__wrap">
-                        <span class="filter__desc">Сортировать посты по</span>
-                        <ul class="filter__list">
-                            <li @click="sortOfDate" class="filter__item">[ дате ]</li>
-                            <li @click="sortOfRating" class="filter__item">[ рейтингу ]</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        </template>
+        <FilterComponent />
         <!-- Posts list -->
         <section class="posts">
             <div class="container">
@@ -112,12 +67,21 @@
 
 import Posts from "../api/posts.js";
 
+import Header from "./components/header";
+import newPostCard from "./components/newPostCard";
+import FilterComponent from "./components/filter";
+
 export default {
     data() {
         return {
             postTextValue: '',
             showToggle: false
         };
+    },
+    components: {
+        Header,
+        newPostCard,
+        FilterComponent
     },
     meteor: {
         postList() {

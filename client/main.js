@@ -1,6 +1,8 @@
 import {Meteor} from 'meteor/meteor'
 import Vue from 'vue';
 
+import store from './store/';
+
 import VueTracker from 'vue-meteor-tracker';
 Vue.use(VueTracker);
 
@@ -13,6 +15,7 @@ import App from '../imports/ui/App.vue';
 
 Meteor.startup(() => {
   new Vue({
+    store,
     render: h => h(App),
   }).$mount('app');
 });
