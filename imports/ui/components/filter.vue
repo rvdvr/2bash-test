@@ -4,8 +4,8 @@
             <div class="filter__wrap">
                 <span class="filter__desc">Сортировать посты по</span>
                 <ul class="filter__list">
-                    <li @click="sortOfDate" class="filter__item">[ дате ]</li>
-                    <li @click="sortOfRating" class="filter__item">[ рейтингу ]</li>
+                    <li class="filter__item">[ дате ]</li>
+                    <li class="filter__item">[ рейтингу ]</li>
                 </ul>
             </div>
         </div>
